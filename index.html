@@ -203,6 +203,15 @@ footer{border-top:1px solid var(--bdim);padding:52px 64px;background:var(--black
   footer{flex-direction:column;gap:20px;text-align:center}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // EmailJS — init with public key
+  // SETUP: go to emailjs.com, create free account, add Outlook service
+  // Then replace these 3 values:
+  (function(){
+    emailjs.init({publicKey: "khduhTgmYl2I01OMt"});
+  })();
+</script>
 </head>
 <body>
 <div id="cur"></div>
@@ -390,11 +399,9 @@ footer{border-top:1px solid var(--bdim);padding:52px 64px;background:var(--black
     <div class="form-wrap rev d2">
       <h3 data-es="Cuéntanos sobre tu <em>empresa.</em>" data-en="Tell us about your <em>company.</em>">Cuéntanos sobre tu <em>empresa.</em></h3>
       <p class="form-sub" data-es="Te contactamos en menos de 24 horas." data-en="We will contact you within 24 hours.">Te contactamos en menos de 24 horas.</p>
-      <form id="cf" action="https://formsubmit.co/henryort_04@outlook.com" method="POST">
-        <input type="hidden" name="_subject" value="Nuevo contacto NODO">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_next" value="about:blank">
+      <form id="cf" method="POST">
+
+
         <div class="field-row">
           <div class="field"><label data-es="Tu nombre" data-en="Your name">Tu nombre</label><input id="fn" type="text" name="Nombre" placeholder="Ej. Juan Martínez" required></div>
           <div class="field"><label data-es="Tu empresa" data-en="Your company">Tu empresa</label><input type="text" name="Empresa" placeholder="Ej. Constructora ABC" required></div>
@@ -480,20 +487,42 @@ document.querySelectorAll('.ct').forEach(t=>t.addEventListener('click',()=>{
   t.classList.add('on');
 }));
 
-// FORM SUBMIT
-document.getElementById('cf').addEventListener('submit',function(){
+// FORM SUBMIT — EmailJS (works local + hosted, no redirect ever)
+document.getElementById('cf').addEventListener('submit',function(e){
+  e.preventDefault();
   const btn=document.getElementById('fsub');
   const msg=document.getElementById('fmsg');
+  const form=e.target;
+  const nombre=form.querySelector('[name="Nombre"]').value;
+  const empresa=form.querySelector('[name="Empresa"]').value;
+  const whatsapp=form.querySelector('[name="WhatsApp"]').value;
+  const giro=form.querySelector('[name="Giro"]').value;
+  const servicio=form.querySelector('[name="Servicio"]').value;
+  const mensaje=form.querySelector('[name="Mensaje"]').value;
   btn.style.opacity='0.6';
   btn.textContent=lang==='es'?'Enviando...':'Sending...';
-  setTimeout(function(){
+  emailjs.send('service_8n0pgie','template_i3y34cx',{
+    nombre:nombre,
+    empresa:empresa,
+    whatsapp:whatsapp,
+    giro:giro,
+    servicio:servicio,
+    mensaje:mensaje,
+    to_email:'henryort_04@outlook.com'
+  }).then(function(){
     msg.className='form-msg ok';
     msg.textContent=lang==='es'
-      ?'\u2713 Mensaje enviado. Te contactamos pronto.'
-      :'\u2713 Message sent. We will contact you shortly.';
+      ?'\u2713 Mensaje enviado. Te contactamos en menos de 24 horas.'
+      :'\u2713 Message sent. We will contact you within 24 hours.';
     btn.style.opacity='1';
     btn.textContent=lang==='es'?'ENVIAR MENSAJE \u2192':'SEND MESSAGE \u2192';
-  },900);
+    form.reset();
+  },function(error){
+    // Fallback: open mailto if EmailJS fails
+    var subject=encodeURIComponent('Contacto NODO - '+empresa);
+    var body=encodeURIComponent('Nombre: '+nombre+'\nEmpresa: '+empresa+'\nWhatsApp: '+whatsapp+'\nGiro: '+giro+'\nServicio: '+servicio+'\nMensaje: '+mensaje);
+    window.location.href='mailto:henryort_04@outlook.com?subject='+subject+'&body='+body;
+  });
 });
 
 </script>
