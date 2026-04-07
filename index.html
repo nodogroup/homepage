@@ -406,7 +406,10 @@ footer{border-top:1px solid var(--bdim);padding:52px 64px;background:var(--black
           <div class="field"><label data-es="Tu nombre" data-en="Your name">Tu nombre</label><input id="fn" type="text" name="Nombre" placeholder="Ej. Juan Martínez" required></div>
           <div class="field"><label data-es="Tu empresa" data-en="Your company">Tu empresa</label><input type="text" name="Empresa" placeholder="Ej. Constructora ABC" required></div>
         </div>
-        <div class="field"><label>WhatsApp</label><input type="text" name="WhatsApp" placeholder="664 000 0000" required></div>
+        <div class="field-row">
+          <div class="field"><label>WhatsApp</label><input type="text" name="WhatsApp" placeholder="664 000 0000" required></div>
+          <div class="field"><label data-es="Correo electrónico" data-en="Email">Correo electrónico</label><input type="email" name="Email" placeholder="correo@empresa.com"></div>
+        </div>
         <div class="field-row">
           <div class="field"><label data-es="Giro de negocio" data-en="Industry">Giro de negocio</label><div class="sel-wrap"><select name="Giro" required><option value="" disabled selected>Selecciona...</option><option>Constructora</option><option>Estudio de Arquitectura</option><option>Fabricante de Muebles</option><option>Desarrolladora Inmobiliaria</option><option>Carpintería</option><option>Otro</option></select></div></div>
           <div class="field"><label data-es="Servicio de interés" data-en="Service of interest">Servicio de interés</label><div class="sel-wrap"><select name="Servicio" required><option value="" disabled selected>Selecciona...</option><option>Diseño Web</option><option>Inteligencia Artificial</option><option>Asesoría Jurídica</option><option>Los tres servicios</option></select></div></div>
@@ -501,10 +504,12 @@ document.getElementById('cf').addEventListener('submit',function(e){
   const mensaje=form.querySelector('[name="Mensaje"]').value;
   btn.style.opacity='0.6';
   btn.textContent=lang==='es'?'Enviando...':'Sending...';
+  const email=form.querySelector('[name="Email"]').value;
   emailjs.send('service_8n0pgie','template_i3y34cx',{
     nombre:nombre,
     empresa:empresa,
     whatsapp:whatsapp,
+    email:email,
     giro:giro,
     servicio:servicio,
     mensaje:mensaje,
