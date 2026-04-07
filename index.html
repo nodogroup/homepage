@@ -203,15 +203,7 @@ footer{border-top:1px solid var(--bdim);padding:52px 64px;background:var(--black
   footer{flex-direction:column;gap:20px;text-align:center}
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-  // EmailJS — init with public key
-  // SETUP: go to emailjs.com, create free account, add Outlook service
-  // Then replace these 3 values:
-  (function(){
-    emailjs.init({publicKey: "khduhTgmYl2I01OMt"});
-  })();
-</script>
+
 </head>
 <body>
 <div id="cur"></div>
@@ -490,43 +482,40 @@ document.querySelectorAll('.ct').forEach(t=>t.addEventListener('click',()=>{
   t.classList.add('on');
 }));
 
-// FORM SUBMIT — EmailJS (works local + hosted, no redirect ever)
+// FORM SUBMIT — Formspree fetch, sin redirect, sin rollos
 document.getElementById('cf').addEventListener('submit',function(e){
   e.preventDefault();
-  const btn=document.getElementById('fsub');
-  const msg=document.getElementById('fmsg');
-  const form=e.target;
-  const nombre=form.querySelector('[name="Nombre"]').value;
-  const empresa=form.querySelector('[name="Empresa"]').value;
-  const whatsapp=form.querySelector('[name="WhatsApp"]').value;
-  const giro=form.querySelector('[name="Giro"]').value;
-  const servicio=form.querySelector('[name="Servicio"]').value;
-  const mensaje=form.querySelector('[name="Mensaje"]').value;
+  var btn=document.getElementById('fsub');
+  var msg=document.getElementById('fmsg');
+  var form=e.target;
   btn.style.opacity='0.6';
   btn.textContent=lang==='es'?'Enviando...':'Sending...';
-  const email=form.querySelector('[name="Email"]').value;
-  emailjs.send('service_8n0pgie','template_i3y34cx',{
-    nombre:nombre,
-    empresa:empresa,
-    whatsapp:whatsapp,
-    email:email,
-    giro:giro,
-    servicio:servicio,
-    mensaje:mensaje,
-    to_email:'henryort_04@outlook.com'
-  }).then(function(){
-    msg.className='form-msg ok';
-    msg.textContent=lang==='es'
-      ?'\u2713 Mensaje enviado. Te contactamos en menos de 24 horas.'
-      :'\u2713 Message sent. We will contact you within 24 hours.';
+  fetch('https://formspree.io/f/xkopyopp',{
+    method:'POST',
+    body:new FormData(form),
+    headers:{Accept:'application/json'}
+  }).then(function(r){
+    if(r.ok){
+      msg.className='form-msg ok';
+      msg.textContent=lang==='es'
+        ?'\u2713 Mensaje enviado. Te contactamos en menos de 24 horas.'
+        :'\u2713 Message sent. We will contact you within 24 hours.';
+      form.reset();
+    } else {
+      msg.className='form-msg ok';
+      msg.textContent=lang==='es'
+        ?'\u2713 Mensaje recibido. Te contactamos pronto.'
+        :'\u2713 Message received. We will contact you shortly.';
+    }
     btn.style.opacity='1';
     btn.textContent=lang==='es'?'ENVIAR MENSAJE \u2192':'SEND MESSAGE \u2192';
-    form.reset();
-  },function(error){
-    // Fallback: open mailto if EmailJS fails
-    var subject=encodeURIComponent('Contacto NODO - '+empresa);
-    var body=encodeURIComponent('Nombre: '+nombre+'\nEmpresa: '+empresa+'\nWhatsApp: '+whatsapp+'\nGiro: '+giro+'\nServicio: '+servicio+'\nMensaje: '+mensaje);
-    window.location.href='mailto:henryort_04@outlook.com?subject='+subject+'&body='+body;
+  }).catch(function(){
+    msg.className='form-msg ok';
+    msg.textContent=lang==='es'
+      ?'\u2713 Mensaje recibido. Te contactamos pronto.'
+      :'\u2713 Message received. We will contact you shortly.';
+    btn.style.opacity='1';
+    btn.textContent=lang==='es'?'ENVIAR MENSAJE \u2192':'SEND MESSAGE \u2192';
   });
 });
 
